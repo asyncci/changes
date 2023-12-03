@@ -33,7 +33,7 @@ public class AutoBase {
         System.out.printf(str);
     }
 
-        public void chooseTheBus() {
+    public void chooseTheBus() {
         System.out.println("\n\n=== === === === === === ===\nChoose the truck by ID: ");
         for (int i = 0; i < trucks.length; i++) {
             System.out.printf("%d.%s%n", i + 1, trucks[i].getName());
@@ -101,7 +101,10 @@ public class AutoBase {
             if (freeDriver != null) {
                 truck.changeDriver(freeDriver);
             } else {
-                System.out.println("No available drivers for the truck");
+                boolean exchange = exchangeDrivers(truck);
+                if (!exchange) {
+                    System.out.println("No available drivers for the truck");
+                }
             }
         } else {
             truck.changeDriver(null);
@@ -129,4 +132,41 @@ public class AutoBase {
         return false;
     }
 
+    private boolean exchangeDrivers(Truck truck) {
+        if (truck.getDriver().isEmpty())
+            return false;
+
+        Truck exchangeTruck = takeOffDriverTruck(truck);
+        if (exchangeTruck != null) {
+            var driver1 = truck.getDriver();
+            var driver2 = exchangeTruck.getDriver();
+
+            assignNewTruck(driver1, exchangeTruck.getName());
+            exchangeTruck.setDriver(driver1);
+
+            assignNewTruck(driver2, truck.getName());
+            truck.setDriver(driver2);
+            return true;
+        }
+        return false;
+    }
+    private Truck takeOffDriverTruck(Truck self) {
+        for (Truck truck: trucks) {
+            if (!truck.equals(self)) {
+                if (truck.getState().equals("base")) {
+                    return truck;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void assignNewTruck(String driverName, String truckName) {
+        for (Driver driver: drivers) {
+            if (driver.getId().equals(driverName)) {
+                driver.setBus(truckName);
+                break;
+            }
+        }
+    }
 }
